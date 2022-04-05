@@ -9,9 +9,9 @@ use lab01_2022_input_validation::*;
 // ```
 // let map = HASHMAP.lock().unwrap();
 // ```
-lazy_static! {
+/*lazy_static! {
     static ref HASHMAP: Mutex<HashMap</* <TO COMPLETE> */, /* <COMPLETE> */>> = Mutex::new(HashMap::new());
-}
+}*/
 
 // TODO: IMPLEMENT UPLOAD LOGIC
 fn file_upload_handler() {}
