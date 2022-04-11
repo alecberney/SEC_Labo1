@@ -3,13 +3,19 @@ use regex::Regex;
 
 // TODO: verify if you need escape . or other
 static REGEX_PROTOCOL_NAME: &str = r"[[:alnum:]]+://";
-static REGEX_SUB_DOMAIN: &str = r"[a-zA-Z\d.-]+";
-static REGEX_TOP_LEVEL_DOMAIN: &str = r".[a-zA-Z.]{1,}[a-zA-Z]{1}"; //.[a-zA-Z.]{1,}[[:alpha:]]
-static REGEX_FOLLOWING_URL: &str = r"[/#?](.*)";
+static REGEX_SUB_DOMAIN: &str = r"[a-zA-Z\d\.-]+";
+static REGEX_TOP_LEVEL_DOMAIN: &str = r"\.[a-zA-Z\.]{1,}[[:alpha:]]";
+static REGEX_FOLLOWING_URL: &str = r"([/#].*)?";
 
 static ERROR_MESSAGE_WHITELIST: &str = "An top level domain given in whitelist is not valid";
 
-// is_valid_top_level_domain
+// TODO; LINTER
+
+/// Check if the given top level domain is valid
+/// # Arguments
+/// * `top_level_domain` - The top level domain to check
+/// # Returns
+/// * `bool` - True if the top level domain is valid, false otherwise
 pub fn is_valid_top_level_domain(top_level_domain: &str) -> bool {
     lazy_static! {
         static ref RE: Regex = Regex::new(&format!("^{}$", REGEX_TOP_LEVEL_DOMAIN)).unwrap();
@@ -17,8 +23,14 @@ pub fn is_valid_top_level_domain(top_level_domain: &str) -> bool {
     RE.is_match(top_level_domain)
 }
 
-// create_whitelist_regex
-// si la whitelist donnée contient un top level domain incompatible, il sera ignoré
+/// Create regex for top level domains from a given whitelist
+/// # Arguments
+/// * `top_level_domains_whitelist` - a list of top level domains
+/// # Return
+/// * `String` - a regex for top level domains or a str containing an error message
+/// if the white list contains an incompatible top level domain
+/// # Errors
+/// * `String` - an error message
 pub fn create_whitelist_regex<'a>(top_level_domains_whitelist: Option<&Vec<&str>>) -> Result<String, &'a str> {
     let mut top_level_domains: String;
 
@@ -41,42 +53,36 @@ pub fn create_whitelist_regex<'a>(top_level_domains_whitelist: Option<&Vec<&str>
     Ok(top_level_domains)
 }
 
-// create_regex_string
+/// Create a regex string from a given url
+/// # Arguments
+/// * `url` - The url to create the regex from
+/// * `top_level_domains_whitelist` - a list of top level domains
+/// # Return
+/// * `String` - The regex string
+/// # Errors
+/// * `&str` - An error message if the url is not valid
 fn create_url_regex_string<'a>(top_level_domains_whitelist: Option<&Vec<&str>>) -> Result<String, &'a str> {
-    match create_whitelist_regex(top_level_domains_whitelist) {
-        Ok(regex) => {
-            Ok(format!(r"^({})?({})+({}){}$",
-                    REGEX_PROTOCOL_NAME,
-                    REGEX_SUB_DOMAIN,
-                    regex,
-                    REGEX_FOLLOWING_URL))
-        }
-        Err(error) => {
-            Err(error)
-        }
-    }
-
-    /*Ok(format!(r"^({})?({})+({})/$",
+    Ok(format!(r"^({})?({})({})({})$",
             REGEX_PROTOCOL_NAME,
             REGEX_SUB_DOMAIN,
-            create_whitelist_regex(top_level_domains_whitelist)?
-    ))*/
+            create_whitelist_regex(top_level_domains_whitelist)?,
+            REGEX_FOLLOWING_URL
+    ))
 }
 
-// validate_url
+/// Validate a given url
+/// # Arguments
+/// * `url` - The url to validate
+/// * `top_level_domains_whitelist` - a list of top level domains
+/// # Return
+/// * `bool` - True if the url is valid, false otherwise
+/// # Errors
+/// * `&str` - An error message if the url is not valid
 pub fn validate_url<'a>(url_input: &'a str, top_level_domains_whitelist: Option<&Vec<&str>>) -> Result<bool, &'a str> {
-    match create_url_regex_string(top_level_domains_whitelist) {
-        Ok(regex) => {
-            Ok(Regex::new(&regex).unwrap().is_match(url_input))
-        }
-        Err(error) => {
-            Err(error)
-        }
-    }
-
-    /*Ok(Regex::new(
+    println!("{}", &create_url_regex_string(top_level_domains_whitelist)?);
+    Ok(Regex::new(
             &create_url_regex_string(top_level_domains_whitelist)?
-        ).unwrap().is_match(&url_input))*/
+        ).unwrap().is_match(&url_input))
 }
 
 // TODO : implement unit testing
@@ -140,14 +146,15 @@ mod tests {
     #[test]
     fn is_valid_top_level_domain_starting_full_stop() {
         // Corner cases
-        //assert!(!is_valid_top_level_domain("aaa")); // TODO: ici
-        //assert!(!is_valid_top_level_domain("a.a")); // TODO: ici
+        assert!(!is_valid_top_level_domain("aaa")); // TODO: ici
+        assert!(!is_valid_top_level_domain("a.a")); // TODO: ici
         assert!(is_valid_top_level_domain("..a"));
     }
 
     #[test]
     fn is_valid_top_level_domain_finishing_ascii_letter() {
         // Corner cases
+        // todo: RAJOUTER commentaire expliquant
         assert!(!is_valid_top_level_domain(".a."));
         assert!(is_valid_top_level_domain("...a"));
         assert!(is_valid_top_level_domain("...A"));
@@ -252,7 +259,7 @@ mod tests {
 
         // Fail
         result_helper(validate_url("http://example./", None), false, None);
-        //result_helper(validate_url("http://examplea/", None), false, None); // TODO: ici
+        result_helper(validate_url("http://examplea/", None), false, None); // TODO: ici
 
         // Corner cases
         result_helper(validate_url("http://example.a/", None), false, None);
@@ -263,8 +270,8 @@ mod tests {
     #[test]
     fn validate_url_top_level_domain_starting_full_stop() {
         // Corner cases
-        //result_helper(validate_url("http://exampleaaa/", None), false, None); // TODO: ici
-        //result_helper(validate_url("http://examplea.a/", None), false, None); // TODO: ici
+        result_helper(validate_url("http://exampleaaa/", None), false, None); // TODO: ici
+        result_helper(validate_url("http://examplea.a/", None), false, None); // TODO: ici
         result_helper(validate_url("http://example..a/", None), true, None);
     }
 
@@ -291,11 +298,19 @@ mod tests {
     fn validate_url_following_part() {
         // Pass
         //assert!(validate_url("http://example.com/", None));
+        //result_helper(validate_url("http://example.com/aaaa", None), true, None);
+        //result_helper(validate_url("http://example.com#aaaa", None), true, None);
+
         // Fail
+        //result_helper(validate_url("http://example.com%aaaa", None), false, None);
+        //result_helper(validate_url("http://example.com?aaaa", None), false, None);
 
         // Corner cases
-
-        //.co.uk
-        //..abc
+        //result_helper(validate_url("http://example.comaaaa", None), false, None);
+        // TODO: pas mettre ici
+        result_helper(validate_url("..google", None), true, None); // TODO pb
     }
+
+    // TODO: corner cases remplacer le . par un autre char spéciale
+    // TODO: tester sans / ou # à la fin de l'url
 }

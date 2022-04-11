@@ -1,0 +1,11 @@
+A:\HEIG\Semestre 6\SEC\Labos\SEC_Labo1\lab01_2022_input_validation\target\debug\deps\read_input-f437ae37a3288acf.rmeta: C:\Users\alecb\.cargo\registry\src\github.com-1ecc6299db9ec823\read_input-0.8.6\src\lib.rs C:\Users\alecb\.cargo\registry\src\github.com-1ecc6299db9ec823\read_input-0.8.6\src\core.rs C:\Users\alecb\.cargo\registry\src\github.com-1ecc6299db9ec823\read_input-0.8.6\src\prelude.rs C:\Users\alecb\.cargo\registry\src\github.com-1ecc6299db9ec823\read_input-0.8.6\src\shortcut.rs C:\Users\alecb\.cargo\registry\src\github.com-1ecc6299db9ec823\read_input-0.8.6\src\test_generators.rs
+
+A:\HEIG\Semestre 6\SEC\Labos\SEC_Labo1\lab01_2022_input_validation\target\debug\deps\libread_input-f437ae37a3288acf.rlib: C:\Users\alecb\.cargo\registry\src\github.com-1ecc6299db9ec823\read_input-0.8.6\src\lib.rs C:\Users\alecb\.cargo\registry\src\github.com-1ecc6299db9ec823\read_input-0.8.6\src\core.rs C:\Users\alecb\.cargo\registry\src\github.com-1ecc6299db9ec823\read_input-0.8.6\src\prelude.rs C:\Users\alecb\.cargo\registry\src\github.com-1ecc6299db9ec823\read_input-0.8.6\src\shortcut.rs C:\Users\alecb\.cargo\registry\src\github.com-1ecc6299db9ec823\read_input-0.8.6\src\test_generators.rs
+
+A:\HEIG\Semestre 6\SEC\Labos\SEC_Labo1\lab01_2022_input_validation\target\debug\deps\read_input-f437ae37a3288acf.d: C:\Users\alecb\.cargo\registry\src\github.com-1ecc6299db9ec823\read_input-0.8.6\src\lib.rs C:\Users\alecb\.cargo\registry\src\github.com-1ecc6299db9ec823\read_input-0.8.6\src\core.rs C:\Users\alecb\.cargo\registry\src\github.com-1ecc6299db9ec823\read_input-0.8.6\src\prelude.rs C:\Users\alecb\.cargo\registry\src\github.com-1ecc6299db9ec823\read_input-0.8.6\src\shortcut.rs C:\Users\alecb\.cargo\registry\src\github.com-1ecc6299db9ec823\read_input-0.8.6\src\test_generators.rs
+
+C:\Users\alecb\.cargo\registry\src\github.com-1ecc6299db9ec823\read_input-0.8.6\src\lib.rs:
+C:\Users\alecb\.cargo\registry\src\github.com-1ecc6299db9ec823\read_input-0.8.6\src\core.rs:
+C:\Users\alecb\.cargo\registry\src\github.com-1ecc6299db9ec823\read_input-0.8.6\src\prelude.rs:
+C:\Users\alecb\.cargo\registry\src\github.com-1ecc6299db9ec823\read_input-0.8.6\src\shortcut.rs:
+C:\Users\alecb\.cargo\registry\src\github.com-1ecc6299db9ec823\read_input-0.8.6\src\test_generators.rs:
