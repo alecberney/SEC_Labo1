@@ -1,13 +1,13 @@
 use lazy_static::lazy_static;
 use regex::Regex;
+use crate::validators::error_messages;
+use crate::validators::error_messages::{INVALID_WHITELIST_TOP_LEVEL_DOMAIN};
 
 // TODO: verify if you need escape . or other
 static REGEX_PROTOCOL_NAME: &str = r"[[:alnum:]]+://";
 static REGEX_SUB_DOMAIN: &str = r"[a-zA-Z\d\.-]+";
 static REGEX_TOP_LEVEL_DOMAIN: &str = r"\.[a-zA-Z\.]{1,}[[:alpha:]]";
 static REGEX_FOLLOWING_URL: &str = r"([/#].*)?";
-
-static ERROR_MESSAGE_WHITELIST: &str = "An top level domain given in whitelist is not valid";
 
 // TODO; LINTER
 
@@ -39,7 +39,7 @@ pub fn create_whitelist_regex<'a>(top_level_domains_whitelist: Option<&Vec<&str>
             top_level_domains = String::new();
             for &domain in domains {
                 if !is_valid_top_level_domain(domain) {
-                    return Err(ERROR_MESSAGE_WHITELIST);
+                    return Err(INVALID_WHITELIST_TOP_LEVEL_DOMAIN);
                 }
                 top_level_domains.push_str(domain);
                 top_level_domains.push_str("|");
@@ -89,7 +89,8 @@ pub fn validate_url<'a>(url_input: &'a str, top_level_domains_whitelist: Option<
 #[cfg(test)]
 mod tests {
     use crate::{create_whitelist_regex, is_valid_top_level_domain, validate_url};
-    use crate::validators::validate_url::{ERROR_MESSAGE_WHITELIST, REGEX_TOP_LEVEL_DOMAIN};
+    use crate::validators::error_messages;
+    use crate::validators::validate_url::{INVALID_WHITELIST_TOP_LEVEL_DOMAIN, REGEX_TOP_LEVEL_DOMAIN};
 
     /// Function that assert a Result to compare if it was the good one (error or value)
     /// # Arguments
