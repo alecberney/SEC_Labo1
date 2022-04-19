@@ -1,7 +1,7 @@
 use lazy_static::lazy_static;
 use regex::Regex;
-use crate::validators::error_messages;
-use crate::validators::error_messages::{INVALID_WHITELIST_TOP_LEVEL_DOMAIN};
+
+use crate::validators::error_messages::INVALID_WHITELIST_TOP_LEVEL_DOMAIN;
 
 // TODO: verify if you need escape . or other
 static REGEX_PROTOCOL_NAME: &str = r"[[:alnum:]]+://";
