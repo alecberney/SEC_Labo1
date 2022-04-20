@@ -33,8 +33,8 @@ pub fn read_from_path(file_path: &str) -> Result<Vec<u8>, &str> {
     }
 
     let buffer = fs::read(file_path);
-    match buffer {
-        Ok(buffer) => return Ok(buffer),
-        Err(_) => return Err(ERROR_READING_FILE),
+    return match buffer {
+        Ok(buffer) => Ok(buffer),
+        Err(_) => Err(ERROR_READING_FILE),
     };
 }

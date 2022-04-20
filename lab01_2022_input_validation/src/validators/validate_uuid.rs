@@ -34,7 +34,7 @@ pub fn validate_file_uuid<'a>(file_path: &'a str, provided_uuid: &'a str) -> Res
     }
 
     let file_buffer = read_from_path(file_path)?;
-    let uuid = Uuid::new_v5(&Uuid::NAMESPACE_URL, &file_buffer).to_hyphenated().to_string();
+    let uuid = Uuid::new_v5(&Uuid::default(), &file_buffer).to_hyphenated().to_string();
 
     Ok(uuid == provided_uuid)
 }
@@ -134,6 +134,7 @@ mod tests {
         assert!(!validate_uuid("ABCDEFGH-IJKL-MNOP-QRST-UVWXYZ012345"));
     }
 
+    // TODO
     #[test]
     fn validate_file_uuid_() {
         let result = 2 + 2;

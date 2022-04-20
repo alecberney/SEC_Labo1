@@ -284,6 +284,7 @@ mod tests {
         result_helper(validate_url("http://example.../", None), false, None);
     }
 
+    // TODO
     #[test]
     fn validate_url_top_level_domain_whitelist() {
         // Pass
@@ -294,6 +295,7 @@ mod tests {
         // Corner cases
     }
 
+    // TODO
     #[test]
     fn validate_url_following_part() {
         // Pass
