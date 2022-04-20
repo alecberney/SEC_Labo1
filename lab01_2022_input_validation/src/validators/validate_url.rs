@@ -1,15 +1,14 @@
 use lazy_static::lazy_static;
 use regex::Regex;
 
-use crate::validators::error_messages::INVALID_WHITELIST_TOP_LEVEL_DOMAIN;
+use crate::validators::error_messages::{INVALID_WHITELIST_TOP_LEVEL_DOMAIN};
 
-// TODO: verify if you need escape . or other
 static REGEX_PROTOCOL_NAME: &str = r"[[:alnum:]]+://";
 static REGEX_SUB_DOMAIN: &str = r"[a-zA-Z\d\.-]+";
 static REGEX_TOP_LEVEL_DOMAIN: &str = r"\.[a-zA-Z\.]{1,}[[:alpha:]]";
 static REGEX_FOLLOWING_URL: &str = r"([/#].*)?";
 
-// TODO; LINTER
+// TODO: LINTER
 
 /// Check if the given top level domain is valid
 /// # Arguments
@@ -30,7 +29,7 @@ pub fn is_valid_top_level_domain(top_level_domain: &str) -> bool {
 /// * `String` - a regex for top level domains or a str containing an error message
 /// if the white list contains an incompatible top level domain
 /// # Errors
-/// * `String` - an error message
+/// * `&str` - an error message
 pub fn create_whitelist_regex<'a>(top_level_domains_whitelist: Option<&Vec<&str>>) -> Result<String, &'a str> {
     let mut top_level_domains: String;
 
@@ -89,8 +88,8 @@ pub fn validate_url<'a>(url_input: &'a str, top_level_domains_whitelist: Option<
 #[cfg(test)]
 mod tests {
     use crate::{create_whitelist_regex, is_valid_top_level_domain, validate_url};
-    use crate::validators::error_messages;
-    use crate::validators::validate_url::{INVALID_WHITELIST_TOP_LEVEL_DOMAIN, REGEX_TOP_LEVEL_DOMAIN};
+    use crate::validators::error_messages::{INVALID_WHITELIST_TOP_LEVEL_DOMAIN};
+    use crate::validators::validate_url::{REGEX_TOP_LEVEL_DOMAIN};
 
     /// Function that assert a Result to compare if it was the good one (error or value)
     /// # Arguments
@@ -260,7 +259,7 @@ mod tests {
 
         // Fail
         result_helper(validate_url("http://example./", None), false, None);
-        result_helper(validate_url("http://examplea/", None), false, None); // TODO: ici
+        result_helper(validate_url("http://examplea/", None), false, None);
 
         // Corner cases
         result_helper(validate_url("http://example.a/", None), false, None);
@@ -271,8 +270,8 @@ mod tests {
     #[test]
     fn validate_url_top_level_domain_starting_full_stop() {
         // Corner cases
-        result_helper(validate_url("http://exampleaaa/", None), false, None); // TODO: ici
-        result_helper(validate_url("http://examplea.a/", None), false, None); // TODO: ici
+        result_helper(validate_url("http://exampleaaa/", None), false, None);
+        result_helper(validate_url("http://examplea.a/", None), false, None);
         result_helper(validate_url("http://example..a/", None), true, None);
     }
 
@@ -309,7 +308,7 @@ mod tests {
         // Corner cases
         //result_helper(validate_url("http://example.comaaaa", None), false, None);
         // TODO: pas mettre ici
-        result_helper(validate_url("..google", None), true, None); // TODO pb
+        result_helper(validate_url("..google", None), true, None);
     }
 
     // TODO: corner cases remplacer le . par un autre char spéciale

@@ -1,33 +1,18 @@
-use std::fs;
-use lazy_static::lazy_static;
-use regex::Regex;
 use infer::{is_image, is_video, get};
 //use infer::image::{is_avif, is_bmp, is_cr2, is_gif, is_heif, is_ico, is_jpeg, is_jpeg2000, is_jxr, is_png, is_psd, is_tiff, is_webp};
 //use infer::video::{is_avi, is_flv, is_m4v, is_mkv, is_mov, is_mp4, is_mpeg, is_webm, is_wmv};
 
-use crate::validators::error_messages::{ERROR_READING_FILE, INVALID_FILE_PATH, INVALID_FILE_GROUP, INVALID_FILE_TYPE};
+use crate::validators::error_messages::{INVALID_FILE_GROUP};
+use crate::validators::file_helper::{read_from_path};
 
-static REGEX_FILE_PATH: &str = r"[a-zA-Z0-9\/\.\\_-]+";
 // Reference used: https://docs.rs/infer/0.7.0/infer/video/index.html
-static FILE_VIDEO_EXTENSION: [&str; 9]  = ["avi", "flv", "m4v", "mkv", "mov", "mp4", "mpeg", "webm", "wmv"];
+//static FILE_VIDEO_EXTENSION: [&str; 9]  = ["avi", "flv", "m4v", "mkv", "mov", "mp4", "mpeg", "webm", "wmv"];
 // Reference used: https://docs.rs/infer/0.7.0/infer/image/index.html
-static FILE_IMAGE_EXTENSION: [&str; 13] = ["avif", "bmp", "cr2", "gif", "heif", "ico", "jpeg",
-"jpg2", "jxr", "png", "psd", "tiff", "webp"];
-static GROUP_TYPE: [&str; 2]  = ["video", "image"];
+//static FILE_IMAGE_EXTENSION: [&str; 13] = ["avif", "bmp", "cr2", "gif", "heif", "ico", "jpeg",
+//"jpg2", "jxr", "png", "psd", "tiff", "webp"];
+//static GROUP_TYPE: [&str; 2]  = ["video", "image"];
 
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
-
-/// Check if the given file path is valid
-/// # Arguments
-/// * `file_path` - The file_path to check
-/// # Returns
-/// * `bool` - True if the file_path is valid, false otherwise
-pub fn is_valid_file_path(file_path: &str) -> bool {
-    lazy_static! {
-        static ref RE: Regex = Regex::new(&format!("^{}$", REGEX_FILE_PATH)).unwrap();
-    }
-    RE.is_match(file_path)
-}
 
 /// Check if the given file path is valid
 /// # Arguments
@@ -89,55 +74,33 @@ fn is_given_file_type_right<'a>(buffer: &'a Vec<u8>, file_type: &'a str, file_gr
     }*/
 }*/
 
-/// given file type or group must be checked
-
-/*
-You are required to validate that the le contents at a surface level match a given le type
-or group (image or video) by using information such as magic bytes and headers. To do so,
-you are allowed to use the infer library to extract mime type and extension information.
-You should also provide the option to validate that the le extension matches the provided
-lename, irrelevant of text case. You can reject all les that are not videos or images.
-If needed, you can obtain sample image and video les from https://file-examples.
-com/
-*/
-
 // todo passer extension ou mime type?
 // todo doit passer le type souhaité?
-pub fn validate_file<'a>(file_path: &'a str, file_type: &'a str, group_type: &'a str) -> Result<bool, &'a str> {
-    // TODO: validation d'input
 
-    if !is_valid_file_path(file_path) {
-        return Err(INVALID_FILE_PATH);
-    }
+/// Check if the given file path owns the valid content and extension
+/// # Arguments
+/// * `file_path` - The file path to check
+/// * `file_extension` - The file extension to check
+/// * `file_extension` - The file extension to check
+/// # Returns
+pub fn validate_file<'a>(file_path: &'a str,
+                         file_extension: &'a str,
+                         file_mime_type: &'a str)
+                         -> Result<bool, &'a str> {
 
-    // https://docs.rs/infer/0.7.0/infer/index.html
-    // https://docs.rs/infer/0.7.0/infer/fn.get.html
+    let buffer = read_from_path(file_path)?;
 
-    //fs::read()
-    /*let kind = infer::get(buffer).expect("file type is known");
+    let file_type_buffer = get(&buffer).expect("file type is known");
 
-    assert_eq!(kind.mime_type(), "image/jpeg");
-    assert_eq!(kind.extension(), "jpg");
-    assert_eq!(kind.matcher_type(), infer::MatcherType::Image);*/
-
-    // Read file
-    let buffer = fs::read(file_path);
-    match buffer {
-        Ok(buffer) => buffer,
-        Err(_) => return Err(ERROR_READING_FILE),
-    };
-
-    let info = infer::Infer::new();
-    //let buf = [0xFF, 0xD8, 0xFF, 0xAA];
-    let file_type_buffer = info.get(&buffer).expect("file type is known");
-
+    // https://docs.rs/infer/0.7.0/infer/fn.is_image.html
+    // https://docs.rs/infer/0.7.0/infer/fn.is_video.html
     if !is_video(&buffer) && !is_image(&buffer) {
         return Err(INVALID_FILE_GROUP);
     }
 
-    // https://docs.rs/infer/0.7.0/infer/fn.is_image.html
-    // https://docs.rs/infer/0.7.0/infer/fn.is_video.html
-    if file_type_buffer.mime_type() == file_type && file_type_buffer.extension() == file_type {
+    if file_path.to_lowercase().ends_with(file_extension)
+        && file_type_buffer.mime_type() == file_mime_type
+        && file_type_buffer.extension() == file_extension {
         Ok(true)
     } else {
         Ok(false)

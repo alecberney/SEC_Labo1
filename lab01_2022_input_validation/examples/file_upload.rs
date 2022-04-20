@@ -13,11 +13,22 @@ use lab01_2022_input_validation::*;
     static ref HASHMAP: Mutex<HashMap</* <TO COMPLETE> */, /* <COMPLETE> */>> = Mutex::new(HashMap::new());
 }*/
 
+// todo: stocker uuid / path et redonner path quand uuid
+
 // TODO: IMPLEMENT UPLOAD LOGIC
-fn file_upload_handler() {}
+fn file_upload_handler() {
+    /*
+    You must not copy the le when uploaded, but simply store its UUID so that you can
+    recover its le path from the UUID at a later time.
+    • You will only allow for image and video les to be uploaded.
+    • You must not allow uploaded les to be overwritten.
+    */
+}
 
 // TODO: IMPLEMENT VERIFY LOGIC
-fn file_verify_handler() {}
+fn file_verify_handler() {
+    // The verification must be done based on the UUID, and not the file path.
+}
 
 // TODO: IMPLEMENT GET URL LOGIC
 fn get_url_handler() {}
