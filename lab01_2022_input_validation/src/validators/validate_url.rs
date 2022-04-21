@@ -8,8 +8,6 @@ static REGEX_SUB_DOMAIN: &str = r"[a-zA-Z\d\.-]+";
 static REGEX_TOP_LEVEL_DOMAIN: &str = r"\.[a-zA-Z\.]{1,}[[:alpha:]]";
 static REGEX_FOLLOWING_URL: &str = r"([/#].*)?";
 
-// TODO: LINTER
-
 /// Check if the given top level domain is valid
 /// # Arguments
 /// * `top_level_domain` - The top level domain to check
@@ -30,7 +28,7 @@ pub fn is_valid_top_level_domain(top_level_domain: &str) -> bool {
 /// if the white list contains an incompatible top level domain
 /// # Errors
 /// * `&str` - an error message
-pub fn create_whitelist_regex<'a>(top_level_domains_whitelist: Option<&Vec<&str>>) -> Result<String, &'a str> {
+fn create_whitelist_regex<'a>(top_level_domains_whitelist: Option<&Vec<&str>>) -> Result<String, &'a str> {
     let mut top_level_domains: String;
 
     match top_level_domains_whitelist {
@@ -78,17 +76,14 @@ fn create_url_regex_string<'a>(top_level_domains_whitelist: Option<&Vec<&str>>) 
 /// # Errors
 /// * `&str` - An error message if the url is not valid
 pub fn validate_url<'a>(url_input: &'a str, top_level_domains_whitelist: Option<&Vec<&str>>) -> Result<bool, &'a str> {
-    println!("{}", &create_url_regex_string(top_level_domains_whitelist)?);
     Ok(Regex::new(
             &create_url_regex_string(top_level_domains_whitelist)?
         ).unwrap().is_match(&url_input))
 }
 
-// TODO : implement unit testing
 #[cfg(test)]
 mod tests {
-    use crate::validators::validate_url::{create_whitelist_regex, is_valid_top_level_domain, validate_url};
-    use crate::validators::validate_url::{REGEX_TOP_LEVEL_DOMAIN};
+    use crate::validators::validate_url::{is_valid_top_level_domain, validate_url};
     use crate::validators::error_messages::{INVALID_WHITELIST_TOP_LEVEL_DOMAIN};
     use crate::validators::test_helper::{result_helper};
 
@@ -131,37 +126,28 @@ mod tests {
     #[test]
     fn is_valid_top_level_domain_starting_full_stop() {
         // Corner cases
+        // We test different cases where top level domain starting with an full stop
+        // or something else
         assert!(!is_valid_top_level_domain("aaa"));
         assert!(!is_valid_top_level_domain("a.a"));
         assert!(is_valid_top_level_domain("..a"));
+        assert!(!is_valid_top_level_domain("&.a"));
+        assert!(!is_valid_top_level_domain("$.a"));
+        assert!(!is_valid_top_level_domain("/.a"));
     }
 
     #[test]
     fn is_valid_top_level_domain_finishing_ascii_letter() {
         // Corner cases
-        // todo: RAJOUTER commentaire expliquant
+        // We test different cases where top level domain finish with an ascii letter
+        // or something else
         assert!(!is_valid_top_level_domain(".a."));
         assert!(is_valid_top_level_domain("...a"));
         assert!(is_valid_top_level_domain("...A"));
         assert!(!is_valid_top_level_domain("..."));
-    }
-
-    #[test]
-    fn create_whitelist_regex_test() {
-        // Pass
-        /*assert_eq!(create_whitelist_regex(None),
-                   String::from(REGEX_TOP_LEVEL_DOMAIN));
-        assert_eq!(create_whitelist_regex(Some(&vec![".ch"])),
-                   String::from(".ch"));
-        assert_eq!(create_whitelist_regex(Some(&vec![".ch", ".com", ".de"])),
-                   String::from(".ch|.com|.de"));
-        // Fail
-        !assert_eq!(create_whitelist_regex(Some(&vec!["..."])),
-                   String::from(ERROR_MESSAGE_WHITELIST));
-        !assert_eq!(create_whitelist_regex(Some(&vec![".ch", "...", ".de"])),
-                   String::from(".ch|.com|.de"));*/
-
-        // Corner cases
+        assert!(!is_valid_top_level_domain("..$"));
+        assert!(!is_valid_top_level_domain("../"));
+        assert!(!is_valid_top_level_domain("..&"));
     }
 
     #[test]
@@ -173,7 +159,7 @@ mod tests {
     }
 
     #[test]
-    fn validate_url_protocol_name() {
+    fn validate_url_protocol_name_alpha_num() {
         // Pass
         result_helper(validate_url("aaaa://example.com/", None), true, None);
         result_helper(validate_url("AAAA://example.com/", None), true, None);
@@ -181,7 +167,7 @@ mod tests {
         result_helper(validate_url("a1a1://example.com/", None), true, None);
         result_helper(validate_url("A1A1://example.com/", None), true, None);
 
-        // Fail
+        // Fail & Corner cases
         result_helper(validate_url("aa$a://example.com/", None), false, None);
         result_helper(validate_url("aa{a://example.com/", None), false, None);
         result_helper(validate_url("aa%a://example.com/", None), false, None);
@@ -189,13 +175,34 @@ mod tests {
         result_helper(validate_url("aa+a://example.com/", None), false, None);
         result_helper(validate_url("aa.a://example.com/", None), false, None);
         result_helper(validate_url("aa-a://example.com/", None), false, None);
-
-        // Corner cases
-        //result_helper(validate_url("http://example.com/", None), true, None);
     }
 
     #[test]
-    fn validate_url_sub_domain() {
+    fn validate_url_protocol_name_end() {
+        // Pass
+        result_helper(validate_url("aaaa://example.com/", None), true, None);
+
+        // Fail
+        result_helper(validate_url("aa$a:////example.com/", None), false, None);
+        result_helper(validate_url("aa{a::://example.com/", None), false, None);
+        result_helper(validate_url("aa%a$$$example.com/", None), false, None);
+        result_helper(validate_url("aa@a&&&example.com/", None), false, None);
+        // Corner cases
+        result_helper(validate_url("aaaa:/example.com/", None), false, None);
+        result_helper(validate_url("aaaa:///example.com/", None), false, None);
+
+        result_helper(validate_url("aaaa:://example.com/", None), false, None);
+        result_helper(validate_url("aaaa//example.com/", None), false, None);
+
+        result_helper(validate_url("aaaa&//example.com/", None), false, None);
+        result_helper(validate_url("aaaa$//example.com/", None), false, None);
+
+        result_helper(validate_url("aaaa:/&example.com/", None), false, None);
+        result_helper(validate_url("aaaa:&/example.com/", None), false, None);
+    }
+
+    #[test]
+    fn validate_url_sub_domain_all() {
         // Pass
         result_helper(validate_url("http://aaaa.com/", None), true, None);
         result_helper(validate_url("http://AAAA.com/", None), true, None);
@@ -206,14 +213,12 @@ mod tests {
         result_helper(validate_url("http://----.com/", None), true, None);
         result_helper(validate_url("http://a-1.a.com/", None), true, None);
 
-        // Fail
+        // Fail & Corner cases
         result_helper(validate_url("http://aa$a.com/", None), false, None);
         result_helper(validate_url("http://aa{a.com/", None), false, None);
-        result_helper(validate_url("http://aa%a.com/", None), false, None);
-        result_helper(validate_url("http://aa@a.com/", None), false, None);
-        result_helper(validate_url("http://aa+a.com/", None), false, None);
-
-        // Corner cases
+        result_helper(validate_url("http://aaa%.com/", None), false, None);
+        result_helper(validate_url("http://@aaa.com/", None), false, None);
+        result_helper(validate_url("http://a+aa.com/", None), false, None);
     }
 
     #[test]
@@ -258,6 +263,10 @@ mod tests {
         result_helper(validate_url("http://exampleaaa/", None), false, None);
         result_helper(validate_url("http://examplea.a/", None), false, None);
         result_helper(validate_url("http://example..a/", None), true, None);
+
+        result_helper(validate_url("http://example&.a/", None), false, None);
+        result_helper(validate_url("http://example$.a/", None), false, None);
+        result_helper(validate_url("http://example/.a/", None), false, None);
     }
 
     #[test]
@@ -267,37 +276,53 @@ mod tests {
         result_helper(validate_url("http://example...a/", None), true, None);
         result_helper(validate_url("http://example...A/", None), true, None);
         result_helper(validate_url("http://example.../", None), false, None);
+
+        result_helper(validate_url("http://example..$/", None), false, None);
+        result_helper(validate_url("http://example..//", None), false, None);
+        result_helper(validate_url("http://example..&/", None), false, None);
     }
 
     // TODO
     #[test]
     fn validate_url_top_level_domain_whitelist() {
+        let top_level_domain_accepted = vec![".com", ".ch", ".de"];
+        let top_level_domain_accepted_fail = vec![".com", "...", ".de"];
+
         // Pass
-        //assert!(validate_url("http://example.com/", None));
+        result_helper(validate_url("https://example.com/", Some(&top_level_domain_accepted)), true, None);
+        result_helper(validate_url("https://example.ch/", Some(&top_level_domain_accepted)), true, None);
+        result_helper(validate_url("https://example.de/", Some(&top_level_domain_accepted)), true, None);
 
         // Fail
+        result_helper(validate_url("https://example.net/", Some(&top_level_domain_accepted)), false, None);
+        result_helper(validate_url("https://example.swiss/", Some(&top_level_domain_accepted)), false, None);
 
         // Corner cases
+        result_helper(validate_url("https://example.ch/", Some(&top_level_domain_accepted_fail)), false, Some(INVALID_WHITELIST_TOP_LEVEL_DOMAIN));
+        result_helper(validate_url("https://example.swiss/", None), true, None);
     }
 
     // TODO
     #[test]
     fn validate_url_following_part() {
         // Pass
-        //assert!(validate_url("http://example.com/", None));
-        //result_helper(validate_url("http://example.com/aaaa", None), true, None);
-        //result_helper(validate_url("http://example.com#aaaa", None), true, None);
+        result_helper(validate_url("http://example.com/aaaa", None), true, None);
+        result_helper(validate_url("http://example.com#aaaa", None), true, None);
 
         // Fail
-        //result_helper(validate_url("http://example.com%aaaa", None), false, None);
-        //result_helper(validate_url("http://example.com?aaaa", None), false, None);
+        result_helper(validate_url("http://example.com%aaaa", None), false, None);
+        result_helper(validate_url("http://example.com?aaaa", None), false, None);
 
         // Corner cases
-        //result_helper(validate_url("http://example.comaaaa", None), false, None);
-        // TODO: pas mettre ici
-        result_helper(validate_url("..google", None), true, None);
+        result_helper(validate_url("http://example.com//aaaa", None), true, None);
+        result_helper(validate_url("http://example.com##aaaa", None), true, None);
+        result_helper(validate_url("http://example.comaaaa", None), true, None);
     }
 
-    // TODO: corner cases remplacer le . par un autre char spéciale
-    // TODO: tester sans / ou # à la fin de l'url
+    #[test]
+    fn validate_url_special_case() {
+        // Corner cases
+        result_helper(validate_url("https://example.com/", None), true, None);
+        result_helper(validate_url("..google", None), true, None);
+    }
 }
