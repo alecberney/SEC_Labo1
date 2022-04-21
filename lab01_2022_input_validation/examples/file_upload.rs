@@ -37,11 +37,13 @@ pub fn get_file_storage_group_from_bytes(buffer: &Vec<u8>) -> Result<(&str, &str
     }
 }
 
+///
 fn generate_uuid(buffer: &Vec<u8>) -> String {
     uuid::Uuid::new_v5(&Uuid::default(), &buffer)
         .to_hyphenated().to_string()
 }
 
+///
 fn file_upload(file_path: &String) -> Result<String, String> {
     // Read file
     let buffer;
@@ -89,6 +91,7 @@ fn file_upload(file_path: &String) -> Result<String, String> {
     }
 }
 
+///
 fn file_upload_handler() {
     let mut uploaded = false;
     while !uploaded {
@@ -105,6 +108,7 @@ fn file_upload_handler() {
     }
 }
 
+///
 fn file_verify(uuid: &String) -> String {
     let map = HASHMAP.lock().unwrap();
     if map.contains_key(uuid){
@@ -115,7 +119,7 @@ fn file_verify(uuid: &String) -> String {
     }
 }
 
-
+///
 fn file_verify_handler() {
     let uuid = input::<String>()
         .msg("Please enter the UUID to check : ").get();
@@ -127,6 +131,7 @@ fn file_verify_handler() {
     }
 }
 
+///
 fn get_url(uuid: &String) -> String {
     let map = HASHMAP.lock().unwrap();
     if map.contains_key(uuid) {
@@ -137,6 +142,7 @@ fn get_url(uuid: &String) -> String {
     }
 }
 
+///
 fn get_url_handler() {
     let uuid = input::<String>()
         .msg("Please enter the UUID to get : ").get();

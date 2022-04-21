@@ -3,6 +3,7 @@ mod validate_url;
 mod validate_uuid;
 mod error_messages;
 mod file_helper;
+mod test_helper;
 
 pub use validate_file::*;
 pub use validate_url::*;

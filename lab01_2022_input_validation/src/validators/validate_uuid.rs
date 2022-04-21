@@ -41,23 +41,8 @@ pub fn validate_file_uuid<'a>(file_path: &'a str, provided_uuid: &'a str) -> Res
 
 #[cfg(test)]
 mod tests {
-    use crate::validate_uuid;
-
-    /// Function that assert a Result to compare if it was the good one (error or value)
-    /// # Arguments
-    /// * `result` - the result to assert
-    /// * `expected_value` - the expected value
-    /// * `expected_error` - the expected error
-    fn result_helper(result: Result<bool, &str>, expected_value: bool, expected_error: Option<&str>) {
-        match result {
-            Ok(result) => assert_eq!(result, expected_value),
-            Err(error) =>
-                match expected_error {
-                    Some(message) => assert_eq!(error, message),
-                    None => assert!(false)
-                }
-        }
-    }
+    use crate::validators::validate_uuid::{validate_uuid, validate_file_uuid};
+    use crate::validators::test_helper::{result_helper};
 
     #[test]
     fn validate_uuid_format() {

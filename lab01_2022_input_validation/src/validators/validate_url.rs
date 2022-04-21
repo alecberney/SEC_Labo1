@@ -87,25 +87,10 @@ pub fn validate_url<'a>(url_input: &'a str, top_level_domains_whitelist: Option<
 // TODO : implement unit testing
 #[cfg(test)]
 mod tests {
-    use crate::{create_whitelist_regex, is_valid_top_level_domain, validate_url};
-    use crate::validators::error_messages::{INVALID_WHITELIST_TOP_LEVEL_DOMAIN};
+    use crate::validators::validate_url::{create_whitelist_regex, is_valid_top_level_domain, validate_url};
     use crate::validators::validate_url::{REGEX_TOP_LEVEL_DOMAIN};
-
-    /// Function that assert a Result to compare if it was the good one (error or value)
-    /// # Arguments
-    /// * `result` - the result to assert
-    /// * `expected_value` - the expected value
-    /// * `expected_error` - the expected error
-    fn result_helper(result: Result<bool, &str>, expected_value: bool, expected_error: Option<&str>) {
-        match result {
-            Ok(result) => assert_eq!(result, expected_value),
-            Err(error) =>
-                match expected_error {
-                    Some(message) => assert_eq!(error, message),
-                    None => assert!(false)
-                }
-        }
-    }
+    use crate::validators::error_messages::{INVALID_WHITELIST_TOP_LEVEL_DOMAIN};
+    use crate::validators::test_helper::{result_helper};
 
     #[test]
     fn is_valid_top_level_domain_classical() {
