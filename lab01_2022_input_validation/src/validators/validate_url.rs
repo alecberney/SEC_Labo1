@@ -131,8 +131,8 @@ mod tests {
     #[test]
     fn is_valid_top_level_domain_starting_full_stop() {
         // Corner cases
-        assert!(!is_valid_top_level_domain("aaa")); // TODO: ici
-        assert!(!is_valid_top_level_domain("a.a")); // TODO: ici
+        assert!(!is_valid_top_level_domain("aaa"));
+        assert!(!is_valid_top_level_domain("a.a"));
         assert!(is_valid_top_level_domain("..a"));
     }
 

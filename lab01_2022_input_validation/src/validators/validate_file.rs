@@ -61,7 +61,7 @@ pub fn validate_file(file_path: &str, verify_extension: bool) -> Result<bool, &s
 mod tests {
     use crate::validators::validate_file::{validate_file};
     use crate::validators::test_helper::{result_helper};
-    use crate::validators::error_messages::{INVALID_FILE_GROUP};
+    use crate::validators::error_messages::{INVALID_FILE_GROUP, ERROR_READING_FILE};
 
     // Tests has been written with file example found here:
     // https://file-examples.com/
@@ -280,5 +280,13 @@ mod tests {
         result_helper(validate_file(
             &format!("{}{}{}{}", BASE_FILE_PATH, OTHERS_MODIFIED_FOLDER, NAMING_CONVENTION, "docx.jpg"),
             false), false, Some(INVALID_FILE_GROUP));
+    }
+
+    #[test]
+    fn validate_file_no_file_found() {
+        // Corner Cases & Fail
+        result_helper(validate_file(
+            &format!("{}{}{}{}", BASE_FILE_PATH, IMAGES_MODIFIED_FOLDER, NAMING_CONVENTION, "test.test"),
+            false), false, Some(ERROR_READING_FILE));
     }
 }

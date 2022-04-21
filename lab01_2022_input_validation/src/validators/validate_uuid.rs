@@ -41,8 +41,26 @@ pub fn validate_file_uuid<'a>(file_path: &'a str, provided_uuid: &'a str) -> Res
 
 #[cfg(test)]
 mod tests {
+    use uuid::Uuid;
+
     use crate::validators::validate_uuid::{validate_uuid, validate_file_uuid};
     use crate::validators::test_helper::{result_helper};
+    use crate::validators::file_helper::{read_from_path};
+    use crate::validators::error_messages::{INVALID_UUID, ERROR_READING_FILE};
+
+    // Tests has been written with file example found here:
+    // https://file-examples.com/
+    // Files are on my github but not delivered for the scholar rendering
+    static BASE_FILE_PATH : &str = "A:/HEIG/Semestre 6/SEC/Labos/SEC_Labo1/files/";
+    static IMAGES_FOLDER : &str = "images/";
+    static NAMING_CONVENTION : &str = "file_example_";
+
+    // We assume that the file is existing and is readable
+    fn generate_uuid(file_path: &str) -> String {
+        let buffer= read_from_path(file_path).unwrap();
+        uuid::Uuid::new_v5(&Uuid::default(), &buffer)
+            .to_hyphenated().to_string()
+    }
 
     #[test]
     fn validate_uuid_format() {
@@ -119,10 +137,39 @@ mod tests {
         assert!(!validate_uuid("ABCDEFGH-IJKL-MNOP-QRST-UVWXYZ012345"));
     }
 
-    // TODO
+    // We won't test all uuid formats because in these tests series cause we did it
+    // before in the function used in this one
     #[test]
-    fn validate_file_uuid_() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
+    fn validate_file_uuid_classical() {
+        // Pass
+        let uuid = generate_uuid(&format!("{}{}{}{}", BASE_FILE_PATH,
+                                          IMAGES_FOLDER, NAMING_CONVENTION, "png.png"));
+        result_helper(validate_file_uuid(
+            &format!("{}{}{}{}", BASE_FILE_PATH, IMAGES_FOLDER, NAMING_CONVENTION, "png.png"),
+            &uuid), true, None);
+
+        // Fail
+        result_helper(validate_file_uuid(
+            &format!("{}{}{}{}", BASE_FILE_PATH, IMAGES_FOLDER, NAMING_CONVENTION, "png.png"),
+            "00000008-0004-0004-0004-000000000012"),
+                      false, None);
+    }
+
+    #[test]
+    fn validate_file_uuid_bad_uuid() {
+        // Corner Case & Fail
+        result_helper(validate_file_uuid(
+            &format!("{}{}{}{}", BASE_FILE_PATH, IMAGES_FOLDER, NAMING_CONVENTION, "png.png"),
+            "00000008_0004-0004-0004-000000000012"),
+                      false, Some(INVALID_UUID));
+    }
+
+    #[test]
+    fn validate_file_uuid_no_file_found() {
+        // Corner Cases & Fail
+        result_helper(validate_file_uuid(
+            &format!("{}{}{}{}", BASE_FILE_PATH, IMAGES_FOLDER, NAMING_CONVENTION, "test.test"),
+            "00000008-0004-0004-0004-000000000012"),
+                      false, Some(ERROR_READING_FILE));
     }
 }
