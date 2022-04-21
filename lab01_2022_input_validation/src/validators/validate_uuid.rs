@@ -27,7 +27,7 @@ pub fn validate_uuid(uuid: &str) -> bool {
 /// # Returns
 /// * `Result<bool, &str>` - True if the uuid is valid, false otherwise
 /// # Errors
-/// * `&str` - Error message
+/// * `&str` - An error message if the uuid is invalid
 pub fn validate_file_uuid<'a>(file_path: &'a str, provided_uuid: &'a str) -> Result<bool, &'a str> {
     if !validate_uuid(provided_uuid) {
         return Err(INVALID_UUID);

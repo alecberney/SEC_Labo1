@@ -36,6 +36,9 @@ fn is_special_extension(file_path: &str, type_file: &Type) -> bool {
 /// * `file_path` - The file path to check
 /// * `verify_extension` - True if the extension must be verified, false otherwise
 /// # Returns
+/// `bool` True - if the file has the valid content and extension, false otherwise
+/// # Errors
+/// * `&str` - An error message if the file isn't a video or an image or if an other error occurs
 pub fn validate_file(file_path: &str, verify_extension: bool) -> Result<bool, &str> {
     let buffer = read_from_path(file_path)?;
 

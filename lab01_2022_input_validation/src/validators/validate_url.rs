@@ -24,10 +24,10 @@ pub fn is_valid_top_level_domain(top_level_domain: &str) -> bool {
 /// # Arguments
 /// * `top_level_domains_whitelist` - a list of top level domains
 /// # Return
-/// * `String` - a regex for top level domains or a str containing an error message
+/// * `String` - A regex for top level domains or a str containing an error message
 /// if the white list contains an incompatible top level domain
 /// # Errors
-/// * `&str` - an error message
+/// * `&str` - An error message
 fn create_whitelist_regex<'a>(top_level_domains_whitelist: Option<&Vec<&str>>) -> Result<String, &'a str> {
     let mut top_level_domains: String;
 
