@@ -7,4 +7,5 @@ mod file_helper;
 pub use validate_file::*;
 pub use validate_url::*;
 pub use validate_uuid::*;
-//pub use error_messages::*;
+pub use error_messages::*;
+pub use file_helper::*;

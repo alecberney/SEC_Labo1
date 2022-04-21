@@ -7,9 +7,6 @@ use read_input::prelude::*;
 use uuid::Uuid;
 use lab01_2022_input_validation::*;
 
-use lab01_2022_input_validation::{read_from_path};
-use lab01_2022_input_validation::{INVALID_FILE_GROUP};
-
 static STORAGE_IMAGES_PATH: &str = "sec.upload/images/";
 static STORAGE_VIDEOS_PATH: &str = "sec.upload/videos/";
 static GROUP_IMAGE: &str = "image";
@@ -29,12 +26,12 @@ lazy_static! {
     static ref HASHMAP: Mutex<HashMap<String, FileStorageData>> = Mutex::new(HashMap::new());
 }
 
-///
+/// This function is used
 pub fn get_file_storage_group_from_bytes(buffer: &Vec<u8>) -> Result<(&str, &str), &str> {
     if is_video(buffer) {
-        Ok((STORAGE_IMAGES_PATH, GROUP_IMAGE))
-    } else if is_image(buffer) {
         Ok((STORAGE_VIDEOS_PATH, GROUP_VIDEO))
+    } else if is_image(buffer) {
+        Ok((STORAGE_IMAGES_PATH, GROUP_IMAGE))
     } else {
         Err(INVALID_FILE_GROUP)
     }
@@ -47,14 +44,19 @@ fn generate_uuid(buffer: &Vec<u8>) -> String {
 
 fn file_upload(file_path: &String) -> Result<String, String> {
     // Read file
-    let buffer_result = read_from_path(file_path);
-    let mut buffer: Vec<u8> = Vec::new();
-    match buffer_result {
+    let buffer;
+    match read_from_path(file_path) {
         Ok(buf) => buffer = buf,
-        Err(error) => Err(format!("{}", error)),
+        Err(error) => return Err(format!("{}", error)),
     };
 
-    if validate_file(file_path, true) {
+    let file_valid;
+    match validate_file(file_path, true) {
+        Ok(valid) => file_valid = valid,
+        Err(error) => return Err(format!("{}", error)),
+    };
+
+    if file_valid {
         let uuid = generate_uuid(&buffer);
 
         // Store uuid and path to map if uuid doesn't already exists
@@ -62,8 +64,8 @@ fn file_upload(file_path: &String) -> Result<String, String> {
         if !map.contains_key(&uuid) {
 
             // Get infos
-            let mut server_filepath;
-            let mut group;
+            let server_filepath;
+            let group;
             match get_file_storage_group_from_bytes(&buffer) {
                 Ok((path, grp)) => {
                     server_filepath = path;
@@ -87,21 +89,12 @@ fn file_upload(file_path: &String) -> Result<String, String> {
     }
 }
 
-/*fn get_file_data(uuid: &str) -> Result<&FileStorageData, String> {
-    let mut map = HASHMAP.lock().unwrap();
-    if map.contains_key(&uuid) {
-        Ok(map.get(&uuid).unwrap().clone())
-    } else {
-        Err(format!("File with uuid: {} doesn't exists", uuid))
-    }
-}*/
-
 fn file_upload_handler() {
-    let file_path = input::<String>()
-        .msg("Please enter the path to an image or video file : ").get();
-
     let mut uploaded = false;
     while !uploaded {
+        let file_path = input::<String>()
+            .msg("Please enter the path to an image or video file : ").get();
+
         match file_upload(&file_path) {
             Ok(message) => {
                 println!("{}", message);
@@ -113,9 +106,9 @@ fn file_upload_handler() {
 }
 
 fn file_verify(uuid: &String) -> String {
-    let mut map = HASHMAP.lock().unwrap();
-    if map.contains_key(&uuid){
-        let file_data = map.get(&uuid).unwrap();
+    let map = HASHMAP.lock().unwrap();
+    if map.contains_key(uuid){
+        let file_data = map.get(uuid).unwrap();
         format!("File {} exists, it's an {} file.", uuid, file_data.file_group)
     } else {
         format!("File not found with uuid: {}", uuid)
@@ -135,10 +128,10 @@ fn file_verify_handler() {
 }
 
 fn get_url(uuid: &String) -> String {
-    let mut map = HASHMAP.lock().unwrap();
-    if map.contains_key(&uuid) {
-        let file_data = map.get(&uuid).unwrap();
-        format!("{}/{}", file_data.server_file_path, file_data.base_file_path)
+    let map = HASHMAP.lock().unwrap();
+    if map.contains_key(uuid) {
+        let file_data = map.get(uuid).unwrap();
+        format!("{}{}", file_data.server_file_path, file_data.base_file_path)
     } else {
         format!("File not found with uuid: {}", uuid)
     }

@@ -5,7 +5,7 @@ use regex::Regex;
 use crate::validators::error_messages::{INVALID_FILE_PATH, ERROR_READING_FILE};
 
 /// This regex only accept classical char for a file name / path
-static REGEX_FILE_PATH: &str = r"[a-zA-Z0-9\/\.\\_-]+";
+static REGEX_FILE_PATH: &str = r"[a-zA-Z0-9/.\\_ :-]+";
 
 /// Check if the given file path is valid
 /// # Arguments
